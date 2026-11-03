@@ -11,21 +11,31 @@
 /* Layout: biglietto d'auguri centrato su carta chiara, con stelline e coccarde sparse ai lati.
    Scelta deliberata di un solo aspetto chiaro, come l'ispirazione: tutti i colori sono espliciti. */
 :root{
-  --bg:#f3efea; --surface:#fbf9f6; --ink:#171513; --muted:#57514b; --line:#ddd5cc;
-  --gold:#e8a35e; --red:#cc4a3c; --green:#4e7d5b; --green-soft:#e3ebe2; --red-soft:#f6e1dc;
+  --bg:#9b1c24; --bg-deep:#7a141b; --surface:#fffaf0; --ink:#1f1a16; --muted:#5e5249; --line:#eadcc4;
+  --gold:#d6a346; --red:#b0222c; --green:#1e5a38; --green-dark:#164429; --green-soft:#e2ede4; --red-soft:#f8e2df;
   --display:"Fraunces", Georgia, "Times New Roman", serif;
   --body:"Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
   color-scheme:light;
 }
 html{background:var(--bg);overflow-x:clip}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;overflow-x:clip;
+/* carta da regalo: rombi sottili sul rosso */
+html{background-color:var(--bg);background-image:
+  linear-gradient(45deg,rgba(255,255,255,.045) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.045) 75%),
+  linear-gradient(45deg,rgba(255,255,255,.045) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.045) 75%),
+  radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.08),transparent 60%);
+  background-size:44px 44px,44px 44px,100% 100%;background-position:0 0,22px 22px,0 0;background-attachment:fixed}
+body{background:transparent;color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;overflow-x:clip;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:72px 64px}
 .stage{position:relative;max-width:760px;margin:0 auto}
-.wrap{position:relative;z-index:1;max-width:520px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:32px;text-align:center}
+.wrap{position:relative;z-index:1;max-width:520px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:30px;text-align:center;
+  background:var(--surface);border-radius:22px;padding:64px 40px 44px;box-sizing:border-box;
+  box-shadow:inset 0 0 0 10px var(--surface),inset 0 0 0 11.5px var(--gold),0 24px 60px rgba(40,0,4,.45)}
+@media (max-width:640px){.wrap{padding:58px 22px 36px}}
+.bow{position:absolute;top:-38px;left:50%;width:96px;transform:translateX(-50%);filter:drop-shadow(0 4px 6px rgba(40,0,4,.35))}
 /* decorazioni */
 .deco{position:absolute;inset:0;pointer-events:none;z-index:0}
 .deco svg{position:absolute;display:block}
-.deco .s{fill:var(--gold)} .deco .r{fill:var(--red)} .deco .g{fill:var(--green)}
+.deco svg{color:#fff;opacity:.85} .deco .gd{color:var(--gold);opacity:1}
 .d1{width:44px;top:-10px;left:6%}
 .d2{width:84px;top:-58px;right:4%}
 .d3{width:58px;top:210px;left:0}
@@ -40,20 +50,20 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17p
 }
 .mark{width:52px;height:52px}
 header{display:flex;flex-direction:column;align-items:center;gap:16px}
-h1{font-family:var(--display);font-style:italic;font-weight:600;font-size:clamp(40px,10vw,64px);line-height:1.04;letter-spacing:-.01em;margin:0;text-wrap:balance}
+h1{color:var(--red);font-family:var(--display);font-style:italic;font-weight:700;font-size:clamp(40px,10vw,64px);line-height:1.04;letter-spacing:-.01em;margin:0;text-wrap:balance}
 .lede{margin:0;max-width:30em;font-weight:500;text-wrap:pretty}
 .meta{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
-.chip{font-size:13px;font-weight:600;padding:4px 12px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-variant-numeric:tabular-nums}
+.chip{font-size:13px;font-weight:700;padding:4px 12px;border-radius:999px;border:1px solid var(--green);color:var(--green);font-variant-numeric:tabular-nums}
 .chip:nth-child(2){border-color:var(--red);color:var(--red)}
 main{width:100%}
 h2{font-family:var(--display);font-style:italic;font-weight:600;font-size:26px;margin:0}
 .panel{display:flex;flex-direction:column;gap:16px}
 .row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
 .btn{font:inherit;font-weight:700;padding:13px 26px;border-radius:999px;border:1.5px solid transparent;cursor:pointer;transition:transform .15s ease}
-.btn.primary{background:var(--ink);color:var(--bg)}
+.btn.primary{background:var(--green);color:#fff;box-shadow:0 3px 0 var(--green-dark)}
 .btn.primary:hover:not(:disabled){transform:translateY(-1px)}
 main .btn.primary{padding:9px 20px;font-size:15px}
-.btn.ghost{background:transparent;color:var(--ink);border-color:var(--ink)}
+.btn.ghost{background:transparent;color:var(--green);border-color:var(--green)}
 .btn.small{padding:6px 14px;font-size:14px}
 .btn:disabled{opacity:.35;cursor:not-allowed}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--red);outline-offset:3px}
@@ -63,7 +73,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 label{font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .field{display:flex;flex-direction:column;gap:8px;min-width:0;text-align:left}
 main .field{text-align:center;align-items:center}
-input,select{font:inherit;color:var(--ink);background:var(--surface);border:1.5px solid var(--ink);border-radius:999px;padding:12px 20px;width:100%;box-sizing:border-box}
+input,select{font:inherit;color:var(--ink);background:#fff;border:1.5px solid var(--green);border-radius:999px;padding:12px 20px;width:100%;box-sizing:border-box}
 main select{max-width:380px;text-align:center;text-align-last:center;font-weight:600;cursor:pointer;
   -webkit-appearance:none;appearance:none;padding-left:44px;padding-right:44px;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 6l5 5 5-5' fill='none' stroke='%23171513' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -72,25 +82,35 @@ main select{max-width:380px;text-align:center;text-align-last:center;font-weight
 .tagbox{display:flex;justify-content:center}
 .tag{position:relative;width:min(100%,440px);display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px 0;animation:pop .7s cubic-bezier(.2,.9,.3,1.2)}
 .tag .to{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
-.tag .who{font-family:var(--display);font-style:italic;font-weight:700;font-size:clamp(42px,11vw,68px);line-height:1.04;overflow-wrap:anywhere;text-wrap:balance}
+.tag .who{color:var(--green);font-family:var(--display);font-style:italic;font-weight:700;font-size:clamp(42px,11vw,68px);line-height:1.04;overflow-wrap:anywhere;text-wrap:balance}
 .tag .from{font-family:var(--display);font-style:italic;font-weight:500;font-size:20px;color:var(--muted)}
 .tag .spark{position:absolute;width:26px;fill:var(--gold)}
 .tag .k1{left:-4px;top:30px} .tag .k2{right:0;bottom:30px;width:20px}
 @keyframes pop{0%{opacity:0;transform:scale(.9)}100%{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.tag{animation:none}.btn{transition:none}}
-.signoff{font-family:var(--display);font-style:italic;font-weight:600;font-size:24px;margin:8px 0 0}
+.signoff{color:var(--red);font-family:var(--display);font-style:italic;font-weight:600;font-size:24px;margin:8px 0 0}
+/* pacco che si apre + coriandoli */
+.giftbox{display:flex;flex-direction:column;align-items:center;gap:14px;padding:6px 0}
+.gift{width:170px;overflow:visible;animation:shake .55s ease-in-out 2}
+.gift .lid{transform-box:fill-box;transform-origin:50% 100%;animation:lidoff .55s cubic-bezier(.3,.7,.4,1) 1.1s forwards}
+.gift .glow{opacity:0;transform-box:fill-box;transform-origin:50% 100%;animation:glow .5s ease-out 1.15s forwards}
+.giftbox .note{font-weight:600}
+@keyframes shake{0%,100%{transform:rotate(0)}20%{transform:rotate(-6deg)}40%{transform:rotate(5deg)}60%{transform:rotate(-4deg)}80%{transform:rotate(3deg)}}
+@keyframes lidoff{to{transform:translate(38px,-90px) rotate(28deg);opacity:0}}
+@keyframes glow{0%{opacity:0;transform:scaleY(.3)}100%{opacity:1;transform:scaleY(1)}}
+#confetti{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:30}
 /* organizzatore */
 #admin{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:calc(14px + env(safe-area-inset-right,0px));z-index:20;display:flex;flex-direction:column;align-items:flex-end;gap:8px;text-align:left}
 .fab{font:inherit;font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;
-  border:1.5px solid var(--ink);background:var(--surface);color:var(--ink);cursor:pointer}
+  border:1.5px solid var(--surface);background:var(--surface);color:var(--red);cursor:pointer;box-shadow:0 4px 12px rgba(40,0,4,.3)}
 .fab .count{background:var(--green);color:#fff;border-radius:999px;padding:1px 8px;font-variant-numeric:tabular-nums}
-.pop{background:var(--surface);border:1.5px solid var(--ink);border-radius:20px;padding:20px;
+.pop{background:var(--surface);border:1.5px solid var(--green);border-radius:20px;padding:20px;
   width:min(390px,calc(100vw - 28px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px)));box-sizing:border-box;
-  max-height:calc(100vh - 100px);overflow-y:auto;box-shadow:6px 6px 0 var(--ink)}
+  max-height:calc(100vh - 100px);overflow-y:auto;box-shadow:6px 6px 0 var(--green)}
 .pop .row{justify-content:flex-start}
 .pophead{display:flex;justify-content:space-between;align-items:center}
 .x{font:inherit;font-size:26px;line-height:1;width:38px;height:38px;border-radius:999px;border:none;background:transparent;color:var(--ink);cursor:pointer}
-.x:hover{background:var(--bg)}
+.x:hover{background:var(--red-soft)}
 .stat{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .stat .big{font-family:var(--display);font-style:italic;font-weight:700;font-size:38px;color:var(--green);font-variant-numeric:tabular-nums}
 .stat small{font-size:20px;color:var(--muted)}
@@ -125,23 +145,44 @@ input{cursor:text}
 .tag .spark{animation:twinkle 3.5s ease-in-out infinite} .tag .k2{animation-delay:-1.7s}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes twinkle{0%,100%{transform:rotate(0) scale(1)}50%{transform:rotate(180deg) scale(.75)}}
-@media (prefers-reduced-motion:reduce){.deco svg,.tag .spark{animation:none}}
+.snow{position:fixed;inset:-200px 0 0 0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(2.5px 2.5px at 30px 40px,#fff 50%,transparent 51%),radial-gradient(2px 2px at 120px 90px,#fff 50%,transparent 51%),
+    radial-gradient(3px 3px at 170px 160px,rgba(255,255,255,.9) 50%,transparent 51%),radial-gradient(1.6px 1.6px at 70px 180px,#fff 50%,transparent 51%);
+  background-size:200px 200px;opacity:.55;animation:fall 22s linear infinite}
+.snow.s2{background-size:320px 320px;opacity:.35;animation-duration:34s}
+@keyframes fall{to{transform:translateY(200px)}}
+.snow.s2{animation-name:fall2} @keyframes fall2{to{transform:translateY(320px)}}
+@media (prefers-reduced-motion:reduce){.deco svg,.tag .spark,.snow{animation:none}}
 </style>
 </head>
 <body>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="flake" viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round">
+    <g id="arm"><path d="M50 50V6M50 22l-10-10M50 22l10-10M50 36l-8-7M50 36l8-7"/></g>
+    <use href="#arm" transform="rotate(60 50 50)"/><use href="#arm" transform="rotate(120 50 50)"/><use href="#arm" transform="rotate(180 50 50)"/>
+    <use href="#arm" transform="rotate(240 50 50)"/><use href="#arm" transform="rotate(300 50 50)"/></g></symbol>
+</defs></svg>
+<div class="snow" aria-hidden="true"></div><div class="snow s2" aria-hidden="true"></div>
+
 <div class="stage">
   <div class="deco" aria-hidden="true">
-    <svg class="d1" viewBox="0 0 100 100"><path class="s" d="M50 0C54 36 64 46 100 50C64 54 54 64 50 100C46 64 36 54 0 50C36 46 46 36 50 0Z"/></svg>
-    <svg class="d2" viewBox="0 0 100 100"><polygon class="g" points="50.0,0.0 56.6,12.6 67.1,3.0 69.0,17.1 82.1,11.7 79.1,25.6 93.3,25.0 85.7,37.0 99.2,41.3 88.0,50.0 99.2,58.7 85.7,63.0 93.3,75.0 79.1,74.4 82.1,88.3 69.0,82.9 67.1,97.0 56.6,87.4 50.0,100.0 43.4,87.4 32.9,97.0 31.0,82.9 17.9,88.3 20.9,74.4 6.7,75.0 14.3,63.0 0.8,58.7 12.0,50.0 0.8,41.3 14.3,37.0 6.7,25.0 20.9,25.6 17.9,11.7 31.0,17.1 32.9,3.0 43.4,12.6"/></svg>
-    <svg class="d3" viewBox="0 0 100 100"><polygon class="r" points="50.0,0.0 57.6,16.9 71.7,5.0 71.2,23.4 89.1,18.8 80.6,35.2 98.7,38.9 84.0,50.0 98.7,61.1 80.6,64.8 89.1,81.2 71.2,76.6 71.7,95.0 57.6,83.1 50.0,100.0 42.4,83.1 28.3,95.0 28.8,76.6 10.9,81.2 19.4,64.8 1.3,61.1 16.0,50.0 1.3,38.9 19.4,35.2 10.9,18.8 28.8,23.4 28.3,5.0 42.4,16.9"/></svg>
-    <svg class="d4" viewBox="0 0 100 100"><polygon class="r" points="50.0,0.0 57.6,16.9 71.7,5.0 71.2,23.4 89.1,18.8 80.6,35.2 98.7,38.9 84.0,50.0 98.7,61.1 80.6,64.8 89.1,81.2 71.2,76.6 71.7,95.0 57.6,83.1 50.0,100.0 42.4,83.1 28.3,95.0 28.8,76.6 10.9,81.2 19.4,64.8 1.3,61.1 16.0,50.0 1.3,38.9 19.4,35.2 10.9,18.8 28.8,23.4 28.3,5.0 42.4,16.9"/></svg>
-    <svg class="d5" viewBox="0 0 100 100"><path class="s" d="M50 0C54 36 64 46 100 50C64 54 54 64 50 100C46 64 36 54 0 50C36 46 46 36 50 0Z"/></svg>
-    <svg class="d6" viewBox="0 0 100 100"><path class="s" d="M50 0C54 36 64 46 100 50C64 54 54 64 50 100C46 64 36 54 0 50C36 46 46 36 50 0Z"/></svg>
-    <svg class="d7" viewBox="0 0 100 100"><path class="s" d="M50 0C54 36 64 46 100 50C64 54 54 64 50 100C46 64 36 54 0 50C36 46 46 36 50 0Z"/></svg>
+    <svg class="d1 gd" viewBox="0 0 100 100"><path fill="currentColor" d="M50 0C54 36 64 46 100 50C64 54 54 64 50 100C46 64 36 54 0 50C36 46 46 36 50 0Z"/></svg>
+    <svg class="d2" viewBox="0 0 100 100"><use href="#flake"/></svg>
+    <svg class="d3" viewBox="0 0 100 100"><use href="#flake"/></svg>
+    <svg class="d4" viewBox="0 0 100 100"><use href="#flake"/></svg>
+    <svg class="d5 gd" viewBox="0 0 100 100"><path fill="currentColor" d="M50 0C54 36 64 46 100 50C64 54 54 64 50 100C46 64 36 54 0 50C36 46 46 36 50 0Z"/></svg>
+    <svg class="d6" viewBox="0 0 100 100"><use href="#flake"/></svg>
+    <svg class="d7 gd" viewBox="0 0 100 100"><path fill="currentColor" d="M50 0C54 36 64 46 100 50C64 54 54 64 50 100C46 64 36 54 0 50C36 46 46 36 50 0Z"/></svg>
   </div>
 
   <div class="wrap">
+    <svg class="bow" viewBox="0 0 120 80" aria-hidden="true">
+      <path d="M60 40C44 12 10 6 12 26c2 16 30 18 48 14z" fill="#1e5a38" stroke="#164429" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M60 40c16-28 50-34 48-14-2 16-30 18-48 14z" fill="#1e5a38" stroke="#164429" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M56 44L40 76l12-4 6 8 4-36M64 44l16 32-12-4-6 8-4-36" fill="#1e5a38" stroke="#164429" stroke-width="3" stroke-linejoin="round"/>
+      <circle cx="60" cy="40" r="9" fill="#d6a346" stroke="#164429" stroke-width="3"/>
+    </svg>
     <header>
       <h1>Secret Santa<br>in ufficio!</h1>
       <p class="lede">Seleziona il tuo nome e scopri il collega a cui farai il regalo. Il budget è zero euro: conta solo l'idea. E acqua in bocca con tutti.</p>
@@ -185,6 +226,23 @@ async function decryptBlob(pass, salt, iv, ct, iter){
 function render(){
   $('#meta').innerHTML = [config.people.length + ' partecipanti', 'Budget: 0 €'].map(b => '<span class="chip">' + esc(b) + '</span>').join('');
   const main = $('#main');
+  if (view.step === 'unwrap'){
+    main.innerHTML = `<div class="giftbox" role="status" aria-live="polite">
+      <svg class="gift" viewBox="0 0 160 170" aria-hidden="true">
+        <defs><linearGradient id="glowg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#f7d98b" stop-opacity=".95"/><stop offset="1" stop-color="#f7d98b" stop-opacity="0"/></linearGradient></defs>
+        <path class="glow" d="M46 74L14 0h132l-32 74z" fill="url(#glowg)"/>
+        <rect x="22" y="76" width="116" height="88" rx="6" fill="#b0222c" stroke="#7a141b" stroke-width="3"/>
+        <rect x="70" y="76" width="20" height="88" fill="#d6a346" stroke="#7a141b" stroke-width="2"/>
+        <g class="lid">
+          <rect x="12" y="52" width="136" height="28" rx="6" fill="#b0222c" stroke="#7a141b" stroke-width="3"/>
+          <rect x="70" y="52" width="20" height="28" fill="#d6a346" stroke="#7a141b" stroke-width="2"/>
+          <path d="M80 52C66 26 38 22 40 38c2 12 24 14 40 14zM80 52c14-26 42-30 40-14-2 12-24 14-40 14z" fill="#1e5a38" stroke="#164429" stroke-width="3" stroke-linejoin="round"/>
+          <circle cx="80" cy="50" r="7" fill="#d6a346" stroke="#164429" stroke-width="2.5"/>
+        </g>
+      </svg>
+      <p class="note">Scarto il tuo biglietto…</p></div>`;
+    renderAdmin(); return;
+  }
   if (view.step === 'reveal'){
     const spark = '<path d="M50 0C54 36 64 46 100 50C64 54 54 64 50 100C46 64 36 54 0 50C36 46 46 36 50 0Z"/>';
     main.innerHTML = `<div class="tagbox"><div class="tag">
@@ -226,7 +284,37 @@ async function openTag(){
   busy = false;
   if (!to){ codeErr = 'Codice non corretto per ' + person.name + '. Controlla di aver scelto il tuo nome e riprova.'; render(); $('#pcode')?.focus(); return; }
   store('ss:last', person.id);
-  view = { step: 'reveal', pid: person.id, to }; render();
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (calm){ view = { step: 'reveal', pid: person.id, to }; render(); return; }
+  view = { step: 'unwrap', pid: person.id, to }; render();
+  setTimeout(() => { if (view.step !== 'unwrap') return; view = { step: 'reveal', pid: person.id, to }; render(); confetti(); }, 1750);
+}
+
+function confetti(){
+  document.getElementById('confetti')?.remove();
+  const c = document.createElement('canvas'); c.id = 'confetti'; document.body.appendChild(c);
+  const ctx = c.getContext('2d'), dpr = Math.min(devicePixelRatio || 1, 2);
+  const W = innerWidth, H = innerHeight; c.width = W * dpr; c.height = H * dpr; ctx.scale(dpr, dpr);
+  const colors = ['#b0222c', '#1e5a38', '#d6a346', '#ffffff', '#e2574c'];
+  const ox = W / 2, oy = Math.min(H * 0.45, 420);
+  const bits = Array.from({ length: 170 }, () => {
+    const a = Math.random() * Math.PI * 2, v = 5 + Math.random() * 9;
+    return { x: ox, y: oy, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 6, w: 6 + Math.random() * 6, h: 8 + Math.random() * 8,
+      r: Math.random() * 6, vr: (Math.random() - .5) * .35, col: colors[Math.random() * colors.length | 0], round: Math.random() < .3 };
+  });
+  const t0 = performance.now();
+  (function frame(t){
+    const age = t - t0; ctx.clearRect(0, 0, W, H);
+    ctx.globalAlpha = Math.max(0, Math.min(1, (3800 - age) / 900));
+    for (const b of bits){
+      b.vx *= .985; b.vy = b.vy * .985 + .32; b.x += b.vx; b.y += b.vy; b.r += b.vr;
+      ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.r); ctx.fillStyle = b.col;
+      if (b.round){ ctx.beginPath(); ctx.arc(0, 0, b.w / 2, 0, 7); ctx.fill(); }
+      else ctx.fillRect(-b.w / 2, -b.h / 2 * Math.abs(Math.cos(b.r * 2)), b.w, b.h * Math.abs(Math.cos(b.r * 2)) + 1);
+      ctx.restore();
+    }
+    if (age < 3800) requestAnimationFrame(frame); else c.remove();
+  })(t0);
 }
 
 function copyText(text, key){

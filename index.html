@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Secret Santa in ufficio</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,500;1,9..144,600;1,9..144,700&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: biglietto d'auguri centrato su carta chiara, con stelline e coccarde sparse ai lati.
+   Scelta deliberata di un solo aspetto chiaro, come l'ispirazione: tutti i colori sono espliciti. */
+:root{
+  --bg:#f3efea; --surface:#fbf9f6; --ink:#171513; --muted:#57514b; --line:#ddd5cc;
+  --gold:#e8a35e; --red:#cc4a3c; --green:#4e7d5b; --green-soft:#e3ebe2; --red-soft:#f6e1dc;
+  --display:"Fraunces", Georgia, "Times New Roman", serif;
+  --body:"Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme:light;
+}
+html{background:var(--bg);overflow-x:clip}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;overflow-x:clip;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:72px 64px}
+.stage{position:relative;max-width:760px;margin:0 auto}
+.wrap{position:relative;z-index:1;max-width:520px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:32px;text-align:center}
+/* decorazioni */
+.deco{position:absolute;inset:0;pointer-events:none;z-index:0}
+.deco svg{position:absolute;display:block}
+.deco .s{fill:var(--gold)} .deco .r{fill:var(--red)} .deco .g{fill:var(--green)}
+.d1{width:44px;top:-10px;left:6%}
+.d2{width:84px;top:-58px;right:4%}
+.d3{width:58px;top:210px;left:0}
+.d4{width:54px;top:200px;right:1%}
+.d5{width:16px;top:470px;left:9%}
+.d6{width:36px;top:500px;left:5%}
+.d7{width:36px;top:500px;right:6%}
+@media (max-width:640px){
+  .d1{width:30px;left:0;top:-30px} .d2{width:56px;top:-64px;right:-14px}
+  .d3{width:36px;left:-18px;top:150px} .d4{width:34px;right:-14px;top:250px}
+  .d5,.d6,.d7{display:none}
+}
+.mark{width:52px;height:52px}
+header{display:flex;flex-direction:column;align-items:center;gap:16px}
+h1{font-family:var(--display);font-style:italic;font-weight:600;font-size:clamp(40px,10vw,64px);line-height:1.04;letter-spacing:-.01em;margin:0;text-wrap:balance}
+.lede{margin:0;max-width:30em;font-weight:500;text-wrap:pretty}
+.meta{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.chip{font-size:13px;font-weight:600;padding:4px 12px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-variant-numeric:tabular-nums}
+.chip:nth-child(2){border-color:var(--red);color:var(--red)}
+main{width:100%}
+h2{font-family:var(--display);font-style:italic;font-weight:600;font-size:26px;margin:0}
+.panel{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.btn{font:inherit;font-weight:700;padding:13px 26px;border-radius:999px;border:1.5px solid transparent;cursor:pointer;transition:transform .15s ease}
+.btn.primary{background:var(--ink);color:var(--bg)}
+.btn.primary:hover:not(:disabled){transform:translateY(-1px)}
+main .btn.primary{padding:9px 20px;font-size:15px}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--ink)}
+.btn.small{padding:6px 14px;font-size:14px}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+.note{font-size:14px;color:var(--muted);margin:0}
+.err{font-size:14px;color:var(--red);margin:0;font-weight:600}
+.empty{padding:12px 0}
+label{font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.field{display:flex;flex-direction:column;gap:8px;min-width:0;text-align:left}
+main .field{text-align:center;align-items:center}
+input,select{font:inherit;color:var(--ink);background:var(--surface);border:1.5px solid var(--ink);border-radius:999px;padding:12px 20px;width:100%;box-sizing:border-box}
+main select{max-width:380px;text-align:center;text-align-last:center;font-weight:600;cursor:pointer;
+  -webkit-appearance:none;appearance:none;padding-left:44px;padding-right:44px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 6l5 5 5-5' fill='none' stroke='%23171513' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 16px center;background-size:16px 16px}
+/* biglietto rivelato */
+.tagbox{display:flex;justify-content:center}
+.tag{position:relative;width:min(100%,440px);display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px 0;animation:pop .7s cubic-bezier(.2,.9,.3,1.2)}
+.tag .to{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+.tag .who{font-family:var(--display);font-style:italic;font-weight:700;font-size:clamp(42px,11vw,68px);line-height:1.04;overflow-wrap:anywhere;text-wrap:balance}
+.tag .from{font-family:var(--display);font-style:italic;font-weight:500;font-size:20px;color:var(--muted)}
+.tag .spark{position:absolute;width:26px;fill:var(--gold)}
+.tag .k1{left:-4px;top:30px} .tag .k2{right:0;bottom:30px;width:20px}
+@keyframes pop{0%{opacity:0;transform:scale(.9)}100%{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.tag{animation:none}.btn{transition:none}}
+.signoff{font-family:var(--display);font-style:italic;font-weight:600;font-size:24px;margin:8px 0 0}
+/* organizzatore */
+#admin{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:calc(14px + env(safe-area-inset-right,0px));z-index:20;display:flex;flex-direction:column;align-items:flex-end;gap:8px;text-align:left}
+.fab{font:inherit;font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;
+  border:1.5px solid var(--ink);background:var(--surface);color:var(--ink);cursor:pointer}
+.fab .count{background:var(--green);color:#fff;border-radius:999px;padding:1px 8px;font-variant-numeric:tabular-nums}
+.pop{background:var(--surface);border:1.5px solid var(--ink);border-radius:20px;padding:20px;
+  width:min(390px,calc(100vw - 28px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px)));box-sizing:border-box;
+  max-height:calc(100vh - 100px);overflow-y:auto;box-shadow:6px 6px 0 var(--ink)}
+.pop .row{justify-content:flex-start}
+.pophead{display:flex;justify-content:space-between;align-items:center}
+.x{font:inherit;font-size:26px;line-height:1;width:38px;height:38px;border-radius:999px;border:none;background:transparent;color:var(--ink);cursor:pointer}
+.x:hover{background:var(--bg)}
+.stat{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.stat .big{font-family:var(--display);font-style:italic;font-weight:700;font-size:38px;color:var(--green);font-variant-numeric:tabular-nums}
+.stat small{font-size:20px;color:var(--muted)}
+.pairsbox{display:flex;flex-direction:column;gap:10px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.pairsbox .row{justify-content:space-between;align-items:center}
+.pairs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;font-size:14px;line-height:1.4}
+.pairs li{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px dashed var(--line)}
+.pairs .g,.pairs .r{min-width:0;overflow-wrap:anywhere}
+.pairs .r{font-weight:700}
+.pairs .arrow{color:var(--red)}
+.seen{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--red-soft);color:var(--red);white-space:nowrap}
+.seen.on{background:var(--green-soft);color:var(--green)}
+.codein{max-width:380px;text-align:center;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:20px;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+.codein::placeholder{text-align:left;font-family:var(--body);font-size:15px;letter-spacing:.02em;font-weight:500;text-transform:none;color:#9a918a}
+.codes{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;font-size:14px;line-height:1.4}
+.codes li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:7px 0;border-bottom:1px dashed var(--line)}
+.codes .g{min-width:0;overflow-wrap:anywhere}
+.codes code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-weight:700;letter-spacing:.12em}
+.codes .copy{padding:4px 10px;font-size:12px;white-space:nowrap}
+
+/* cursore a regalo e decorazioni che girano */
+:root{--gift-cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M16 9c-2-4-7-5-7-2s4 2 7 2c3 0 7 1 7-2s-5-2-7 2z' fill='none' stroke='%23171513' stroke-width='2.4' stroke-linejoin='round'/%3E%3Cpath d='M16 9c-2-4-7-5-7-2s4 2 7 2c3 0 7 1 7-2s-5-2-7 2z' fill='none' stroke='%23e8a35e' stroke-width='1.2' stroke-linejoin='round'/%3E%3Crect x='5' y='13' width='22' height='16' rx='2.5' fill='%23cc4a3c' stroke='%23171513' stroke-width='1.6'/%3E%3Crect x='4' y='9' width='24' height='6' rx='2' fill='%23cc4a3c' stroke='%23171513' stroke-width='1.6'/%3E%3Crect x='14' y='9' width='4' height='20' fill='%23e8a35e' stroke='%23171513' stroke-width='1'/%3E%3C/svg%3E") 16 16}
+html,body{cursor:var(--gift-cursor),auto}
+button:not(:disabled),select,.fab,.x{cursor:var(--gift-cursor),pointer}
+input{cursor:text}
+.deco svg{transform-origin:50% 50%;animation:spin 18s linear infinite}
+.deco .d2{animation-duration:26s;animation-direction:reverse}
+.deco .d3{animation-duration:14s}
+.deco .d4{animation-duration:16s;animation-direction:reverse}
+.deco .d1,.deco .d5,.deco .d6,.deco .d7{animation:twinkle 4.5s ease-in-out infinite}
+.deco .d5{animation-delay:-1.2s} .deco .d6{animation-delay:-2.4s} .deco .d7{animation-delay:-3.3s}
+.tag .spark{animation:twinkle 3.5s ease-in-out infinite} .tag .k2{animation-delay:-1.7s}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes twinkle{0%,100%{transform:rotate(0) scale(1)}50%{transform:rotate(180deg) scale(.75)}}
+@media (prefers-reduced-motion:reduce){.deco svg,.tag .spark{animation:none}}
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="deco" aria-hidden="true">
+    <svg class="d1" viewBox="0 0 100 100"><path class="s" d="M50 0C54 36 64 46 100 50C64 54 54 64 50 100C46 64 36 54 0 50C36 46 46 36 50 0Z"/></svg>
+    <svg class="d2" viewBox="0 0 100 100"><polygon class="g" points="50.0,0.0 56.6,12.6 67.1,3.0 69.0,17.1 82.1,11.7 79.1,25.6 93.3,25.0 85.7,37.0 99.2,41.3 88.0,50.0 99.2,58.7 85.7,63.0 93.3,75.0 79.1,74.4 82.1,88.3 69.0,82.9 67.1,97.0 56.6,87.4 50.0,100.0 43.4,87.4 32.9,97.0 31.0,82.9 17.9,88.3 20.9,74.4 6.7,75.0 14.3,63.0 0.8,58.7 12.0,50.0 0.8,41.3 14.3,37.0 6.7,25.0 20.9,25.6 17.9,11.7 31.0,17.1 32.9,3.0 43.4,12.6"/></svg>
+    <svg class="d3" viewBox="0 0 100 100"><polygon class="r" points="50.0,0.0 57.6,16.9 71.7,5.0 71.2,23.4 89.1,18.8 80.6,35.2 98.7,38.9 84.0,50.0 98.7,61.1 80.6,64.8 89.1,81.2 71.2,76.6 71.7,95.0 57.6,83.1 50.0,100.0 42.4,83.1 28.3,95.0 28.8,76.6 10.9,81.2 19.4,64.8 1.3,61.1 16.0,50.0 1.3,38.9 19.4,35.2 10.9,18.8 28.8,23.4 28.3,5.0 42.4,16.9"/></svg>
+    <svg class="d4" viewBox="0 0 100 100"><polygon class="r" points="50.0,0.0 57.6,16.9 71.7,5.0 71.2,23.4 89.1,18.8 80.6,35.2 98.7,38.9 84.0,50.0 98.7,61.1 80.6,64.8 89.1,81.2 71.2,76.6 71.7,95.0 57.6,83.1 50.0,100.0 42.4,83.1 28.3,95.0 28.8,76.6 10.9,81.2 19.4,64.8 1.3,61.1 16.0,50.0 1.3,38.9 19.4,35.2 10.9,18.8 28.8,23.4 28.3,5.0 42.4,16.9"/></svg>
+    <svg class="d5" viewBox="0 0 100 100"><path class="s" d="M50 0C54 36 64 46 100 50C64 54 54 64 50 100C46 64 36 54 0 50C36 46 46 36 50 0Z"/></svg>
+    <svg class="d6" viewBox="0 0 100 100"><path class="s" d="M50 0C54 36 64 46 100 50C64 54 54 64 50 100C46 64 36 54 0 50C36 46 46 36 50 0Z"/></svg>
+    <svg class="d7" viewBox="0 0 100 100"><path class="s" d="M50 0C54 36 64 46 100 50C64 54 54 64 50 100C46 64 36 54 0 50C36 46 46 36 50 0Z"/></svg>
+  </div>
+
+  <div class="wrap">
+    <header>
+      <h1>Secret Santa<br>in ufficio!</h1>
+      <p class="lede">Seleziona il tuo nome e scopri il collega a cui farai il regalo. Il budget è zero euro: conta solo l'idea. E acqua in bocca con tutti.</p>
+      <div class="meta" id="meta"></div>
+    </header>
+
+    <main id="main">
+      <div class="panel empty"><p class="note">Sto caricando il sorteggio…</p></div>
+    </main>
+
+    <p class="signoff">Buone feste a tutti!</p>
+  </div>
+</div>
+
+<div id="admin" hidden></div>
+
+<script>
+const DATA = {"people":[{"ct":"3rUT+Uwh4YUaoWRltcR3NbBeDrGphSrolW1CqY3eRVrmmb4JA9tl","id":"p0","iv":"FbWfai9VOgvE8WSO","name":"Eleonora Brambilla","salt":"UIX9kI6crxe9oUmLp5O0uA=="},{"ct":"c1neb7+l5CUKdQZwefxr+JyvPxD/WYeelGAjxcltQ/E8QYN6wjku85w=","id":"p1","iv":"OtItcD3i9/hKWMGT","name":"Alessandro Sala","salt":"Rs3Wc1ZkEETS9XHB1DLw7Q=="},{"ct":"L0DvcBMtvqyNAgHESNMdpvAnEtcmJRi9AX0ffSqf9aegZ9O5eQ==","id":"p2","iv":"jmtm0QpVgzpnsfyq","name":"Alice Bocchio","salt":"7xchc2jHWyaRFLSnfmYhPw=="},{"ct":"7YdvGX192Z0SPFIyWsqZbiP6azdk0Iml4es6xMwWK5tUKKrifi2vusgc","id":"p3","iv":"f/z3pQ+ISKWko+en","name":"Alice Lo Nardo","salt":"+LD1GBiDM5qmY6OlFGo9dw=="},{"ct":"MxLgj36VRrTUckpM2sMPuUlkiIumdEggjYoFe/oo3sZAkEInCZHd88ay0dja","id":"p4","iv":"LVWEI/PuobwhiyHU","name":"Andrea Baldin","salt":"UylJfi3857UZ5+6SMcQ4Eg=="},{"ct":"7Hh9PBslGv1ziqRSupqCjQWIc/iKjoRYQuTyyA2GLinOCJ/X9HkG","id":"p5","iv":"Lf0uynkRYHTLeSaJ","name":"Angelo Sanvito","salt":"/yZATryAmTS0Qw/ZYdVcuQ=="},{"ct":"ZpumOekCdJIoYYZG7UxXkXveb9jiti/QrcXGwpZSs2YxFp8Fs48=","id":"p6","iv":"pfs+MUqfmJUIGrIm","name":"Annachiara Candiani","salt":"RT2D3m8S9B8CxuOx7JeyLQ=="},{"ct":"aTI17l6sQGuwGEQbAHq8LARjdtxtt8bEbF/A4B5QATWrC774kP8C","id":"p7","iv":"3d95PAATMTStIM8o","name":"Camilla Avino","salt":"kA7xkiv1XldubwbUZUx/fQ=="},{"ct":"NqMtRbi9i3EEfrIgv5J9zBJkEvQNjiYVht7iQAZxYXlDfJkFEeevn+s=","id":"p8","iv":"fYqlJK68hhk6j7lh","name":"Caterina Comini","salt":"zjuK+FtdD+jAmKlJ0gnSuA=="},{"ct":"FX1G8TinDXMWdm/CQh1OgGxMr4HIZl85JdULtcpSIDzLJvcsDoQ1o2V08gX+","id":"p9","iv":"dadOeTrxX3/Jwhja","name":"Cheluvi Joshi","salt":"tpLu+hdmCdm/RWtvSc5RDA=="},{"ct":"BqoC33GBgFTQV4xyZ+//xR0yDM4TbOSnrzGiGq603lX1Ma3d3MwWJw==","id":"p10","iv":"ET3Vlu+XkOUoh0q/","name":"Chiara Minotti","salt":"c0RjhWdnmW+zOaBKRBRYVg=="},{"ct":"nWi4iUHhYFm86JtOYtMSVWHd0hBGEXjEl9M47TEag0xBkenr98WOxR0PXH8=","id":"p11","iv":"VjdmB2gQESfFPmql","name":"Erika Conversano","salt":"+/a9NAcVnEk1q68zX40bQw=="},{"ct":"KPK4gXmcSSyosdW0YCYJG+APyOI+aovzLqSEN1LEl+88hhMRTVPBEw==","id":"p12","iv":"4ejJFGtHR2a22DeA","name":"Filipa Ferreira","salt":"BGQxoKTI51+OQ/iJN2kk8g=="},{"ct":"NldEHQtpwOIIrPUN/Ls7NV77YqFuJV3Cy4IVBH4UvHnX7bcz4593","id":"p13","iv":"6+HngckkWGy1F4yK","name":"Giada Ercolani","salt":"d2AKOIekZOqHco2WcLYfCQ=="},{"ct":"OkUsgb7WDoq60FOWy1RGthB7l0KSB8BMZ0UviywRisAfVbpfJH85ZDxCo+w=","id":"p14","iv":"ZrAYkzu0al/FN70E","name":"Josef D'Alessandro","salt":"MseTSoAqz6elkdvjCqqYcw=="},{"ct":"VVwu6AoDTzUIGja6UibLiymXumg+6yv4WuJt3G69Q2am5EsVM31286o=","id":"p15","iv":"zOi61m1G2YdJL/fz","name":"Julia Elena Hernandez Bonino","salt":"EClaDOjIYbCIGI/vAfn4wg=="},{"ct":"HZCWwNjfLL6ncsLF3spxi7FXa/FzNp+6jsbXwEQM1ldPdkF9GdZExw==","id":"p16","iv":"zmzrQ2qAewWScd9E","name":"Leonardo Suozzo","salt":"QmR32rmvZNXW8zoQBV266Q=="},{"ct":"gjf3VZC4Atad/YS/mREFP1olR7Vi35aMdbg1x/pyknSzpuOPRT+ZMDI=","id":"p17","iv":"wR6Xnckroxbq/MkS","name":"Luca Rubini","salt":"TAP+4Q7g8OlhaG1sbW2pTw=="},{"ct":"GXeTrFzQdsP0o6ZlmLPjS0sXHozT6780ZcGDTdtUJVRUOOcJOdMmXqzXGY9uXgsOKSnkM8/E","id":"p18","iv":"0YbRPGfPY2FkrfK/","name":"Luna Maria Grazzini","salt":"bMWjd9odCsA8D0bw7DbgbA=="},{"ct":"N8eiVLK0g0HszqWn2aZy8D/DUzCiAf8y9QG+Rb28/ourQ3sTU3+atA==","id":"p19","iv":"7DctdLd1KXmlD5us","name":"Maddalena Mazzocchi","salt":"cn0CKBlvsOuxpBcUwwlxtg=="},{"ct":"iUPDqIHVhWd8y5WfTU6koNROlFAFSoC+QFyjSOU99jghRKbXJk1Axg8=","id":"p20","iv":"HNuayNhWrEzwQhcf","name":"Manuel Colombo","salt":"QfzTJOVfDUH4ELrAbXyRPw=="},{"ct":"/809ptYYaWQ2rXzaFJqeZJeyH7Y3/z5vlb83zTdRCLxo7KrNtcBZ59oI","id":"p21","iv":"38pD6K1U3AwLoGNm","name":"Marco Alteri","salt":"25RZm23lFECkEq+KoTC/pw=="},{"ct":"bHtyKZcO+9Bdoh0sKEHzIuusqDdHHVu8Np2DZDT+Sd4VYS/6/tMYPQ==","id":"p22","iv":"4UI19uWx4V8ABLfp","name":"Marco Pecoraro","salt":"6L6+MRzX8oboyS58tJ4fIg=="},{"ct":"cRZncHcSlvBPIU9LRZl0YcmtGXth2p1bLyIovJGgkzHveTQ3pdD+SyI=","id":"p23","iv":"S6YZvE/UIseziGmL","name":"Mario Montalto","salt":"IpFHOCpGCufB2kHsCqHzJg=="},{"ct":"ncLZcLZhxAf4B8eguCzlaJQNU4hR3gByh5tGye9EjHg5yZ+FTX4cJw==","id":"p24","iv":"MBSpF1CeahwO1yc/","name":"Martina Curcio","salt":"kgVKShjDkPq3Cc3Qfn9nAA=="},{"ct":"0x47M94+iAmLXIIei7XOc22aGefGr7RtGxFWL95xJ8G1jZSfg+yMGx4UlgXg","id":"p25","iv":"DaAKzJAe+WafY8wC","name":"Monica Ferretti","salt":"YxHAeAHHR6CUcK7auwfC+g=="},{"ct":"ppE07Py6LgiMbNSpzQPpd1hJ+btfOLj4V0iy93JFGw3BZ/4CbEn7/A==","id":"p26","iv":"glZauWOlhSvLiRzG","name":"Riccardo D'este","salt":"lRxSMh8XZ2V4zi/AQ1NMTg=="},{"ct":"HZ0skhEiXPh1PmAWhqT32imS3DsWlGO6gyPFCYcwk6O7TwVaABB1S1o=","id":"p27","iv":"td564Cv244i6w8r5","name":"Samuele Fortuna","salt":"EQD1XrQcEt8AkzOGPrEHTA=="},{"ct":"D/A7n9NsZgSxtRxTiswDQ3a70RGFoOiSFsXAC75H+CqbEmSG8fDn5w==","id":"p28","iv":"U7zLp6u9FHcJhuRT","name":"Sibilla Schapira","salt":"X8EjLLFefuKTWcMaWWjidw=="},{"ct":"/omBVQu+zucems0bZdgzP/VxTArch8r3ZcIojDSHx7bVdhB8ouMH1b0b","id":"p29","iv":"P+pe2lHcF8KtnoYZ","name":"Claudia Sinosich","salt":"15ATZTVXwgVEbw5jkXm6Vw=="}],"kdf":{"alg":"PBKDF2-SHA256","iter":150000},"drawId":"d5e59ca8c","admin":{"salt":"CQy7BwybxYy14h2XhQTZEQ==","iv":"PpYvCBZ8jVpXviO6","ct":"qHCqB1IXqZwhRPQraaLBZTDXJwetVEomUspo2hpZI8OBilLQDcU0jdFYc9LZ225vTUMGosphBsVSzKBs1s0Ks6FObITfRCo7kzJBRMPLwbjT5CybXskg5xYhhcs/o0KS9X6jDC9KpaB9B0GAWD4N0KfJqOrcZNAs+2boAX0ZjqzwLrg4V3J+v8eWYEZN9e9fELNyhhqzoyFPtr7SPO1O+gwCViRm+KLVsExMXajNm7ncmTRnIKS5O3YxTOMmto6hYBnQeQZi7EKWhHuFPzfyjP2Mqr9l3OCP802eSiDF6zqlNk2ULWz5BXGHtI+K7n7WYdsNGlYxr8QgzYjZ55+sVUt+GC+ojCMoLthC938hm/GJn1Z8j/XoBCDmF7OhU+HMDGcrmi/RIPtsTWywdM57QMZepiIGnjeBGUjLQIOu/qlWE3kaDG3nnU6NzGslmBKo5PeVpT6W43QZxBO+eHZF0Nn6pXM3j1ljRlt6W4Rg5uBM1Dr14VvQzZ6UyI/R7yEP/8JPmVnRASaLDWvpuRCzFB8GMaCqLIg/tTzTEcjl6CBnba9hWpC1/GFZkLdv2JNkc8WUBSwY1qvxmxMzkJ4YcBKAQjXdnHQT7RrDYSsTSnmlDreL4HjHMnZh/EjoyJ80YdrTmv1kAHgDLiENQQGs5lDHB0Be3vdGqDLokOqlylW+b2VFeHSqK7GLWu/rpupfpq7daS/9r8R+JDPGvBHgM9pwZrVU6OEbKdBip+wLRGUohEa7ViMRI5wkMg08GpNr8USfhWtY/9T8s7ri++/yor38prWlIA2Qj8Z+QtIh7B3RHIBhOR7fVLrvDLfvAOMnhi/t4fng09vBYf8dX5ga5YYhzgg69g46UZ2Nh27v1ooQX14IZWr84feBt64SVVeDgyBgmEeaDoMESzILicappHzF6S3nTGYPA74uefg8VeaiHg71JluT9KwaExl1Sl2Jd4wcvFGvxVPMF+8BO5D1ndrqTZsz/9a+JY0MLpF7PLs+BGv+N8uNZSwCP0kvn9h01zABpaBvbmDzCQZfxfLXeEvJAdBsOA9laFcn07+BPmfb2zo5zTAUDaLUC2J1mrwmOYoMT5NCeiybNexjnysY0lCCTxuzVPXFlnlX5UCGBPS2hWTaAAKXpOptnXyQlUolpitJlGG3kIsu5tn48d82PmSj9LZq4eLdbOyWxJRDieazoPSZKnILWDxX3MmG6abReqxQI4qR3IkklrybVQVmUjWXUVpRkIhTAv4=","iter":600000}};
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const config = DATA;
+let view = { step: 'pick', pid: null, to: '' };
+let selPid = '', codeVal = '', codeErr = '', busy = false;
+let adminOpen = false, unlocked = false, adminCodeErr = false, adminBusy = false, showPairs = false, showCodes = false;
+let secret = null, copied = '';
+
+function store(k, v){ try{ localStorage.setItem(k, v) }catch(e){} }
+function recall(k){ try{ return localStorage.getItem(k) }catch(e){ return null } }
+const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const normCode = s => s.toUpperCase().replace(/[^A-Z0-9]/g, '');
+function personName(pid){ return config.people.find(p => p.id === pid)?.name || '' }
+
+async function decryptBlob(pass, salt, iv, ct, iter){
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']);
+  const key = await crypto.subtle.deriveKey({ name: 'PBKDF2', hash: 'SHA-256', salt: b64(salt), iterations: iter },
+    base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+  const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(iv) }, key, b64(ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+
+function render(){
+  $('#meta').innerHTML = [config.people.length + ' partecipanti', 'Budget: 0 €'].map(b => '<span class="chip">' + esc(b) + '</span>').join('');
+  const main = $('#main');
+  if (view.step === 'reveal'){
+    const spark = '<path d="M50 0C54 36 64 46 100 50C64 54 54 64 50 100C46 64 36 54 0 50C36 46 46 36 50 0Z"/>';
+    main.innerHTML = `<div class="tagbox"><div class="tag">
+      <svg class="spark k1" viewBox="0 0 100 100" aria-hidden="true">${spark}</svg><svg class="spark k2" viewBox="0 0 100 100" aria-hidden="true">${spark}</svg>
+      <span class="to">${esc(personName(view.pid))}, tu fai il regalo a</span>
+      <span class="who">${esc(view.to)}</span>
+      <span class="from">Budget zero euro: vale l'idea, non lo scontrino.</span></div></div>
+      <div class="row" style="margin-top:22px"><button class="btn ghost small" id="hide">Nascondi</button></div>`;
+    $('#hide').onclick = () => { view = { step: 'pick' }; codeVal = ''; render(); };
+  } else {
+    const opts = config.people.slice().sort((a,b)=>a.name.localeCompare(b.name,'it'))
+      .map(p => `<option value="${p.id}" ${p.id === selPid ? 'selected' : ''}>${esc(p.name)}</option>`).join('');
+    main.innerHTML = `<form class="panel" id="pickForm" autocomplete="off">
+      <div class="field"><label for="who">Chi sei?</label>
+        <select id="who"><option value="">Seleziona il tuo nome</option>${opts}</select></div>
+      <div class="field"><label for="pcode">Il tuo codice personale</label>
+        <input id="pcode" class="codein" inputmode="text" autocapitalize="characters" spellcheck="false" maxlength="12" placeholder="es. K7MQ2P"></div>
+      ${codeErr ? `<p class="err">${esc(codeErr)}</p>` : ''}
+      <div class="row"><button class="btn primary" id="go" type="submit">${busy ? 'Apro il biglietto…' : 'Scopri a chi fai il regalo'}</button></div>
+      <p class="note">Il codice te l'ha mandato l'organizzatrice in privato. Senza il codice giusto il nome resta segreto.</p></form>`;
+    const sel = $('#who'), inp = $('#pcode'), go = $('#go');
+    inp.value = codeVal;
+    const sync = () => { go.disabled = busy || !sel.value || normCode(inp.value).length < 4; };
+    sync();
+    sel.onchange = () => { selPid = sel.value; codeErr = ''; sync(); };
+    inp.oninput = () => { codeVal = inp.value; sync(); };
+    $('#pickForm').onsubmit = e => { e.preventDefault(); openTag(); };
+  }
+  renderAdmin();
+}
+
+async function openTag(){
+  const person = config.people.find(p => p.id === selPid);
+  const code = normCode(codeVal);
+  if (!person || !code || busy) return;
+  busy = true; codeErr = ''; render();
+  let to = null;
+  try { to = (await decryptBlob(code, person.salt, person.iv, person.ct, config.kdf.iter)).to; } catch(e){ to = null; }
+  busy = false;
+  if (!to){ codeErr = 'Codice non corretto per ' + person.name + '. Controlla di aver scelto il tuo nome e riprova.'; render(); $('#pcode')?.focus(); return; }
+  store('ss:last', person.id);
+  view = { step: 'reveal', pid: person.id, to }; render();
+}
+
+function copyText(text, key){
+  const done = () => { copied = key; renderAdmin(); setTimeout(() => { if (copied === key){ copied = ''; renderAdmin(); } }, 1600); };
+  try { navigator.clipboard.writeText(text).then(done, () => {}); } catch(e){}
+}
+
+function renderAdmin(){
+  const box = $('#admin');
+  box.hidden = false;
+  const fabHtml = `<button class="fab" id="fab" aria-expanded="${adminOpen}" aria-controls="pop">Organizzatore</button>`;
+  const head = `<div class="pophead"><h2>Organizzatore</h2><button class="x" id="closePop" aria-label="Chiudi">×</button></div>`;
+  const hidden = adminOpen ? '' : 'hidden';
+  if (!unlocked){
+    const prev = $('#code')?.value || '';
+    box.innerHTML = fabHtml + `<div class="pop" id="pop" role="dialog" aria-label="Organizzatore" ${hidden}><div class="panel">${head}
+      <form id="lockForm" class="field"><label for="code">Codice organizzatore</label>
+      <input id="code" type="password" autocomplete="off">
+      ${adminCodeErr ? '<p class="err">Codice non corretto. Riprova.</p>' : ''}
+      <div class="row" style="margin-top:6px"><button class="btn primary" type="submit" ${adminBusy ? 'disabled' : ''}>${adminBusy ? 'Controllo…' : 'Sblocca'}</button></div></form></div></div>`;
+    $('#code').value = prev;
+    $('#lockForm').onsubmit = async e => {
+      e.preventDefault(); if (adminBusy) return;
+      const pass = $('#code').value; adminBusy = true; renderAdmin();
+      const a = DATA.admin;
+      try { secret = await decryptBlob(pass, a.salt, a.iv, a.ct, a.iter); unlocked = true; adminCodeErr = false; }
+      catch(err){ secret = null; adminCodeErr = true; }
+      adminBusy = false; renderAdmin(); if (!unlocked) $('#code')?.focus();
+    };
+  } else {
+    const sorted = config.people.slice().sort((a,b)=>a.name.localeCompare(b.name,'it'));
+    const pairsHtml = '<ul class="pairs">' + sorted.map(p =>
+      `<li><span class="g">${esc(p.name)}</span><span class="arrow" aria-hidden="true">→</span><span class="r">${esc(personName(secret.pairs[p.id]))}</span><span></span></li>`).join('') + '</ul>';
+    const codesHtml = '<ul class="codes">' + sorted.map(p => {
+      const code = secret.codes[p.id], first = p.name.split(' ')[0];
+      const msg = `Ciao ${first}! Il tuo codice personale per il Secret Santa è ${code}. Apri il link ${location.href.split('#')[0]}, scegli il tuo nome e inseriscilo per scoprire a chi fai il regalo (budget 0 €). Non dirlo a nessuno!`;
+      return `<li><span class="g">${esc(p.name)}</span><code>${esc(code)}</code><button class="btn ghost small copy" data-msg="${esc(msg)}" data-key="${p.id}">${copied === p.id ? 'Copiato' : 'Copia messaggio'}</button></li>`;
+    }).join('') + '</ul>';
+    box.innerHTML = fabHtml + `<div class="pop" id="pop" role="dialog" aria-label="Organizzatore" ${hidden}><div class="panel">${head}
+      <div class="pairsbox"><div class="row"><strong>Codici personali</strong>
+        <button class="btn ghost small" id="toggleCodes">${showCodes ? 'Nascondi' : 'Mostra codici'}</button></div>
+        ${showCodes ? codesHtml : '<p class="note">Da mandare a ognuno in privato. "Copia messaggio" copia un testo pronto da incollare su Teams, con il link.</p>'}</div>
+      <div class="pairsbox"><div class="row"><strong>Abbinamenti</strong>
+        <button class="btn ghost small" id="togglePairs">${showPairs ? 'Nascondi' : 'Mostra abbinamenti'}</button></div>
+        ${showPairs ? pairsHtml : '<p class="note">Nascosti, così nessuno li vede sbirciando il tuo schermo.</p>'}</div>
+      <p class="note">Chiudendo questo riquadro si blocca di nuovo.</p></div></div>`;
+    $('#togglePairs').onclick = () => { showPairs = !showPairs; renderAdmin(); };
+    $('#toggleCodes').onclick = () => { showCodes = !showCodes; renderAdmin(); };
+    box.querySelectorAll('.copy').forEach(b => b.onclick = () => copyText(b.dataset.msg, b.dataset.key));
+  }
+  $('#fab').onclick = () => { if (adminOpen) closeAdmin(); else { adminOpen = true; renderAdmin(); $('#code')?.focus(); } };
+  $('#closePop').onclick = () => { closeAdmin(); $('#fab')?.focus(); };
+}
+function closeAdmin(){ adminOpen = false; unlocked = false; showPairs = false; showCodes = false; adminCodeErr = false; secret = null; renderAdmin(); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && adminOpen) closeAdmin(); });
+document.addEventListener('click', e => { if (adminOpen && !e.composedPath().includes($('#admin'))) closeAdmin(); });
+
+selPid = recall('ss:last') || '';
+if (!config.people.some(p => p.id === selPid)) selPid = '';
+render();
+</script>
+</body>
+</html>
